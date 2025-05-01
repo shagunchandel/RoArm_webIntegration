@@ -1,4 +1,4 @@
-const char* htmlForm_wiFi = R"(
+const char* main_page = R"(
 
 <!DOCTYPE html>
 <html lang="en">
