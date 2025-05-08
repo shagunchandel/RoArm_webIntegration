@@ -548,14 +548,28 @@ const char* main_page = R"rawliteral(
       <div>
         <div class="section-title">Main Control Panel</div>
         <div class="robot-controls">
+
+
+
+          <div class="control-group" aria-label="sholder Controls">
+            <h3>sholder Controls</h3>
+            <div class="draggable-control" id="shoulderControl">
+              <div class="draggable-track"></div>
+              <div class="draggable-knob" id="sholderKnob" tabindex="0"></div>
+            </div>
+            <div class="control-value">Rotation: <span id="sholderValue">0</span>°</div>
+          </div>
+
           <div class="control-group" aria-label="Elbow Controls">
-            <h3>Elbow Movements</h3>
-            <div class="control-buttons"><button class="btn-primary" onclick="moveElbow('up')" onmouseup="this.blur()" aria-label="Raise elbow">Up</button><button class="btn-primary" onclick="moveElbow('down')" onmouseup="this.blur()" aria-label="Lower elbow">Down</button></div>
+            <h3>Elbow Controls</h3>
+            <div class="draggable-control" id="elbowControl">
+              <div class="draggable-track"></div>
+              <div class="draggable-knob" id="elbowKnob" tabindex="0"></div>
+            </div>
+            <div class="control-value">Rotation: <span id="elbowValue">0</span>°</div>
           </div>
-          <div class="control-group" aria-label="Base Movements">
-            <h3>Base Movements</h3>
-            <div class="control-buttons"><button class="btn-primary" onclick="moveBaseMovement('forward')" onmouseup="this.blur()" aria-label="Move base forward">Forward</button><button class="btn-primary" onclick="moveBaseMovement('backward')" onmouseup="this.blur()" aria-label="Move base backward">Backward</button></div>
-          </div>
+        
+
           <div class="control-group" aria-label="Base Rotation">
             <h3>Base Rotation</h3>
             <div class="draggable-control" id="baseControl">
@@ -564,21 +578,25 @@ const char* main_page = R"rawliteral(
             </div>
             <div class="control-value">Rotation: <span id="baseValue">0</span>°</div>
           </div>
+
+
           <div class="control-group" aria-label="Wrist Controls">
             <h3>Wrist Rotation</h3>
             <div class="draggable-control" id="wristControl">
               <div class="draggable-track"></div>
               <div class="draggable-knob" id="wristKnob" tabindex="0"></div>
             </div>
-            <div class="control-value">Angle: <span id="wristValue">0</span>°</div>
+            <div class="control-value">Rotation: <span id="wristValue">0</span>°</div>
           </div>
+
+
           <div class="control-group" aria-label="Fingers Controls">
             <h3>Fingers Position</h3>
             <div class="draggable-control" id="fingersControl">
               <div class="draggable-track"></div>
               <div class="draggable-knob" id="fingersKnob" tabindex="0"></div>
             </div>
-            <div class="control-value">Grip: <span id="fingersValue">0</span>%</div>
+            <div class="control-value">Rotation: <span id="fingersValue">0</span>%</div>
           </div>
         </div>
       </div>
@@ -661,9 +679,11 @@ const char* main_page = R"rawliteral(
         isPausedRecording = false;
 
       function initAllDraggables() {
-        initDraggableControl("baseControl", "baseKnob", "baseValue", 0, 360, 0, moveBase);
-        initDraggableControl("wristControl", "wristKnob", "wristValue", -180, 180, 0, moveWrist);
-        initDraggableControl("fingersControl", "fingersKnob", "fingersValue", 0, 100, 0, setFingersGrip)
+        initDraggableControl("baseControl", "baseKnob", "baseValue", 0, 4095, 0, moveBase);
+        initDraggableControl("wristControl", "wristKnob", "wristValue", 0, 4095, 0, moveWrist);
+        initDraggableControl("fingersControl", "fingersKnob", "fingersValue", 0, 4095, 0, setFingersGrip);
+        initDraggableControl("elbowControl", "elbowKnob", "elbowValue", 0, 4095, 0, moveElbow);
+        initDraggableControl("shoulderControl", "sholderKnob", "sholderValue", 0, 4095, 0, moveSholder);
       }
       window.addEventListener("DOMContentLoaded", () => {
         setTimeout(initAllDraggables, 100);
@@ -687,18 +707,60 @@ const char* main_page = R"rawliteral(
 
       function moveBase(v) {
         console.log("Base rotation set to:", v)
+
+        fetch("/action", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            base: v,
+          }),
+        })
       }
 
       function moveElbow(d) {
         console.log("Elbow moving:", d)
+        
       }
 
       function moveWrist(a) {
         console.log("Wrist angle set to:", a)
+        fetch("/action", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            wrist: a,
+          }),
+        })
+      }
+
+      function moveSholder(f) {
+        console.log("Wrist angle set to:", f)
+        fetch("/action", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            sholder: f,
+          }),
+        })
       }
 
       function setFingersGrip(g) {
         console.log("Fingers grip set to:", g, "%")
+        fetch("/action", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            gripper: g,
+          }),
+        })
       }
 
       function voiceCommand() {
