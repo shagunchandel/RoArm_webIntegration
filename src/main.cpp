@@ -13,17 +13,62 @@ const char* password = "123456789";
 //     Serial.print(".");
 //   }
 // }
-void  web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len){
+// void  web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len){
+//   StaticJsonDocument<256> doc;
+//   DeserializationError error = deserializeJson(doc, data, len);
+//   if (error) {
+//       request->send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+//       return;
+//   }
+  
+//   position1 = doc["base"];
+//   st.WritePosEx(11, position1, SERVO_SPEED, SERVO_ACC);
+// }
+
+
+void web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len) {
   StaticJsonDocument<256> doc;
   DeserializationError error = deserializeJson(doc, data, len);
+
   if (error) {
-      request->send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
-      return;
+    request->send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+    return;
   }
-  
-  position1 = doc["base"];
-  st.WritePosEx(11, position1, SERVO_SPEED, SERVO_ACC);
+
+  if (doc.containsKey("base")) {
+    position1 = doc["base"];
+    st.WritePosEx(11, position1, SERVO_SPEED, SERVO_ACC);
+  }
+  else if (doc.containsKey("wrist")) {
+    position5 = doc["wrist"];
+    st.WritePosEx(15, position5, SERVO_SPEED, SERVO_ACC);
+  }
+  else if (doc.containsKey("sholder")) {
+    position2 = doc["sholder"];
+    // position3 = 2047 + (2047 - position2) + 1;
+    position3 = 4095 - position2;
+    byte ID[2] = {12, 13};
+    short position[2] = {position2, position3};
+    unsigned short speed[2] = {SERVO_SPEED, SERVO_SPEED};  // Speed for both servos
+    byte acc[2] = {SERVO_ACC, SERVO_ACC};
+    st.SyncWritePosEx(ID, 2, position, speed, acc);
+  }
+  else if (doc.containsKey("elbow")) {
+    position4 = doc["elbow"];
+    st.WritePosEx(14, position4, SERVO_SPEED, SERVO_ACC);
+  }
+  else if (doc.containsKey("gripper")) {
+    position6 = doc["gripper"];
+    st.WritePosEx(1, position6, SERVO_SPEED, SERVO_ACC);
+  }
+  else {
+    request->send(400, "application/json", "{\"error\":\"No valid joint specified\"}");
+    return;
+  }
+
+  request->send(200, "application/json", "{\"status\":\"OK\"}");
 }
+
 
 
 void setup() {
@@ -36,7 +81,7 @@ void setup() {
   WiFi.softAP("Roarm", "12345678");
   // WiFi.begin(ssid, password);
   // WifiConnect();
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/controls", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/html", main_page);
   });
   server.onRequestBody([](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
@@ -51,9 +96,10 @@ void setup() {
   server.begin();
 
   Serial.println(WiFi.localIP());
+  ElegantOTA.begin(&server);
 
 }
 
 void loop() {
-  
+  ElegantOTA.loop();
 }

@@ -679,11 +679,11 @@ const char* main_page = R"rawliteral(
         isPausedRecording = false;
 
       function initAllDraggables() {
-        initDraggableControl("baseControl", "baseKnob", "baseValue", 0, 4095, 0, moveBase);
+        initDraggableControl("baseControl", "baseKnob", "baseValue", 0, 4095, 3000, moveBase);
         initDraggableControl("wristControl", "wristKnob", "wristValue", 0, 4095, 0, moveWrist);
         initDraggableControl("fingersControl", "fingersKnob", "fingersValue", 0, 4095, 0, setFingersGrip);
-        initDraggableControl("elbowControl", "elbowKnob", "elbowValue", 0, 4095, 0, moveElbow);
-        initDraggableControl("shoulderControl", "sholderKnob", "sholderValue", 0, 4095, 0, moveSholder);
+        initDraggableControl("elbowControl", "elbowKnob", "elbowValue", 900, 3030, 2047, moveElbow);
+        initDraggableControl("shoulderControl", "sholderKnob", "sholderValue", 1000, 3000, 2047, moveSholder);
       }
       window.addEventListener("DOMContentLoaded", () => {
         setTimeout(initAllDraggables, 100);
@@ -721,6 +721,15 @@ const char* main_page = R"rawliteral(
 
       function moveElbow(d) {
         console.log("Elbow moving:", d)
+        fetch("/action", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            elbow: d,
+          }),
+        })
         
       }
 
