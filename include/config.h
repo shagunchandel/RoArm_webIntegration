@@ -43,3 +43,4 @@ short position4 = initialPosition;
 short position5 = initialPosition;
 short position6 = initialPosition;
 
+unsigned long previousOnlineCheck = 0;

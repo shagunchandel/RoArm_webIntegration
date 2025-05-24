@@ -2,11 +2,12 @@
 #include "roarm_html.h"
 #include "arm_functn.h"
 #include "led_ctrl.h"
+#include "arm_wifi.h"
 
 // AsyncWebServer server(80);
 
-const char* ssid = "moto";
-const char* password = "123456789";
+// const char* ssid = "moto";
+// const char* password = "123456789";
 
 // void WifiConnect(){
 //   while (WiFi.status() != WL_CONNECTED){
@@ -88,9 +89,16 @@ void setup() {
   st.pSerial = &Serial1;
 
   torqueEnable();
-  WiFi.softAP("Roarm", "12345678");
+
+  setupWiFi();
+  connectToWiFi();
+
+  // WiFi.softAP("Roarm", "12345678");
   // WiFi.begin(ssid, password);
   // WifiConnect();
+
+  
+
   server.on("/controls", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(200, "text/html", main_page);
   });
@@ -112,6 +120,12 @@ void setup() {
 }
 
 void loop() {
+  if (WiFi.status() != WL_CONNECTED && millis() - previousOnlineCheck > 2000) {
+        Serial.println("Wifi Check1");
+        // onlineMode = false;
+        connectToWiFi();
+        previousOnlineCheck = millis();
+    }
 
   // lightCtrl(255);
   ElegantOTA.loop();
