@@ -680,8 +680,8 @@ const char* main_page = R"rawliteral(
 
       function initAllDraggables() {
         initDraggableControl("baseControl", "baseKnob", "baseValue", 0, 4095, 3000, moveBase);
-        initDraggableControl("wristControl", "wristKnob", "wristValue", 0, 4095, 0, moveWrist);
-        initDraggableControl("fingersControl", "fingersKnob", "fingersValue", 0, 4095, 0, setFingersGrip);
+        initDraggableControl("wristControl", "wristKnob", "wristValue", 700, 2061, 1500, moveWrist);
+        initDraggableControl("fingersControl", "fingersKnob", "fingersValue", 1000, 2100, 1500, setFingersGrip);
         initDraggableControl("elbowControl", "elbowKnob", "elbowValue", 900, 3030, 2047, moveElbow);
         initDraggableControl("shoulderControl", "sholderKnob", "sholderValue", 1000, 3000, 2047, moveSholder);
       }
@@ -788,7 +788,18 @@ const char* main_page = R"rawliteral(
 
       function flashLightToggle(el) {
         el.classList.toggle("active");
-        console.log("Flash Light toggled")
+        const lightctrlValue = el.classList.contains("active") ? 255 : 0;
+        fetch("/action", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            lightctrl: lightctrlValue,
+          }),
+        });
+
+        console.log("Flash Light toggled");
       }
 
       function toggleDarkMode(el) {

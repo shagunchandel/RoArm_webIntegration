@@ -24,6 +24,17 @@ AsyncWebServer server(80);
 #define SERVO_SPEED 600
 #define SERVO_ACC 15
 
+
+const uint16_t PWMA = 25;         
+const uint16_t AIN2 = 17;        
+const uint16_t AIN1 = 21;
+
+int freq = 100000;
+int channel_A = 5;
+int resolution = 8;
+// int channel_B = 6;
+
+
 int initialPosition = 2047;
 short position1 = initialPosition;
 short position2 = initialPosition;

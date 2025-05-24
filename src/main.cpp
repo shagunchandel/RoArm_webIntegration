@@ -1,6 +1,7 @@
 #include "config.h"
 #include "roarm_html.h"
 #include "arm_functn.h"
+#include "led_ctrl.h"
 
 // AsyncWebServer server(80);
 
@@ -61,6 +62,10 @@ void web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len) {
     position6 = doc["gripper"];
     st.WritePosEx(1, position6, SERVO_SPEED, SERVO_ACC);
   }
+  else if (doc.containsKey("lightctrl")) {
+    int led = doc["lightctrl"];
+    lightCtrl(led);
+  }
   else {
     request->send(400, "application/json", "{\"error\":\"No valid joint specified\"}");
     return;
@@ -74,6 +79,11 @@ void web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len) {
 void setup() {
   Serial.begin(115200);
   Serial1.begin(1000000, SERIAL_8N1, S_RXD, S_TXD);
+
+
+  switchPinInit();
+
+
 
   st.pSerial = &Serial1;
 
@@ -97,9 +107,12 @@ void setup() {
 
   Serial.println(WiFi.localIP());
   ElegantOTA.begin(&server);
+  // lightCtrl(255);
 
 }
 
 void loop() {
+
+  // lightCtrl(255);
   ElegantOTA.loop();
 }
