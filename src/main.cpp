@@ -51,8 +51,8 @@ void web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len) {
     position3 = 4095 - position2;
     byte ID[2] = {12, 13};
     short position[2] = {position2, position3};
-    unsigned short speed[2] = {SERVO_SPEED, SERVO_SPEED};  // Speed for both servos
-    byte acc[2] = {SERVO_ACC, SERVO_ACC};
+    unsigned short speed[2] = {300, 300};  // Speed for both servos
+    byte acc[2] = {15, 15};
     st.SyncWritePosEx(ID, 2, position, speed, acc);
   }
   else if (doc.containsKey("elbow")) {
@@ -92,6 +92,11 @@ void setup() {
 
   setupWiFi();
   connectToWiFi();
+
+  if (!MDNS.begin("roarm")) {
+    Serial.println("Error starting mDNS");
+    return;
+  }
 
   // WiFi.softAP("Roarm", "12345678");
   // WiFi.begin(ssid, password);

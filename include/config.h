@@ -3,6 +3,7 @@
 #include <SCServo.h>
 #include <ESPAsyncWebServer.h>
 #include <WiFi.h>
+#include <ESPmDNS.h>
 #include <ElegantOTA.h>
 
 SMS_STS st;
@@ -21,7 +22,7 @@ AsyncWebServer server(80);
 #define SERVO_4_ID 15
 #define SERVO_5_ID 1
 
-#define SERVO_SPEED 600
+#define SERVO_SPEED 300
 #define SERVO_ACC 15
 
 
