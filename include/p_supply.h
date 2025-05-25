@@ -32,7 +32,7 @@ void InaDataUpdate(){
   power_mW = ina219.getBusPower();    //Get power
   loadVoltage_V  = busVoltage_V + (shuntVoltage_mV/1000);
   ina219_overflow = ina219.getOverflow();
-//   percentage = ((loadVoltage_V - 9.0) / 3.6) * 100
+  percentage = (((loadVoltage_V - 8.0) / 4.6) * 100);
 }
 
 
@@ -59,8 +59,8 @@ const char htmlPage[] PROGMEM = R"rawliteral(
   </head>
   <body>
     <h1>Ro-Arm Battery Monitor</h1>
-    <div class="box">Voltage: <span id="temp1">%TEMP1%</span> V</div>
-    <div class="box">Current: <span id="temp2">%TEMP2%</span> mAmps</div>
+    <div class="box">Voltage: <span id="temp1">%voltage%</span> V</div>
+    <div class="box">Battery Percentage: <span id="temp2">%percentae%</span> mAmps</div>
 
     <script>
       setInterval(function () {

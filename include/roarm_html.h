@@ -783,6 +783,15 @@ const char* main_page = R"rawliteral(
 
       function forceStop() {
         alert("Force Stop initiated. All processes halted!");
+        fetch("/action", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            stop: 1,
+          }),
+        });
         console.log("Force Stop Triggered")
       }
 

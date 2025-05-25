@@ -68,6 +68,16 @@ void web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len) {
     int led = doc["lightctrl"];
     lightCtrl(led);
   }
+  else if (doc.containsKey("stop")){
+    uint8_t ID_all[6] = {11, 12, 13, 14, 15, 1};
+    torqueDisable();
+    // st.writeByte(11, 0x18, 0x00);
+    // st.writeByte(11, 0x18, 0x00);
+    // st.writeByte(11, 0x18, 0x00);
+    // st.writeByte(11, 0x18, 0x00);
+    // st.writeByte(11, 0x18, 0x00);
+
+  }
   else {
     request->send(400, "application/json", "{\"error\":\"No valid joint specified\"}");
     return;
@@ -121,7 +131,7 @@ void setup() {
       server.on("/temps", HTTP_GET, [](AsyncWebServerRequest *request){
         String json = "{";
         json += "\"temp1\":" + String(loadVoltage_V) + ",";
-        json += "\"temp2\":" + String(current_mA);
+        json += "\"temp2\":" + String(percentage);
         json += "}";
         request->send(200, "application/json", json);
         // Serial.println(json);
@@ -131,7 +141,7 @@ void setup() {
 
   Serial.println(WiFi.localIP());
   ElegantOTA.begin(&server);
-  lightCtrl(255);
+  // lightCtrl(255);
 
 }
 
@@ -142,32 +152,32 @@ void loop() {
         connectToWiFi();
         previousOnlineCheck = millis();
     }
-    st.WritePosEx(15, 1000, SERVO_SPEED, SERVO_ACC);
-    delay(6000);
-    st.WritePosEx(15, 2047, SERVO_SPEED, SERVO_ACC);
-    delay(6000);
-    st.WritePosEx(14, 2900, SERVO_SPEED, SERVO_ACC);
-    delay(6000);
-    st.WritePosEx(14, 1100, SERVO_SPEED, SERVO_ACC);
-    delay(9000);
-    position[0] = 1250;
-    position[1] = 4095 - position[0];
-    st.SyncWritePosEx(ID, 2, position, speed, acc);
-    delay(9000);
-    position[0] = 2700;
-    position[1] = 4095 - position[0];
-    st.SyncWritePosEx(ID, 2, position, speed, acc);
-    delay(9000);
-    position[0] = 2047;
-    position[1] = 4095 - position[0];
-    st.SyncWritePosEx(ID, 2, position, speed, acc);
-    delay(9000);
-    st.WritePosEx(11, 0, SERVO_SPEED, SERVO_ACC);
-    delay(9000);
-    st.WritePosEx(11, 4095, SERVO_SPEED, SERVO_ACC);
-    delay(9000);
-    st.WritePosEx(11, 3000, SERVO_SPEED, SERVO_ACC);
-    delay(6000);
+    // st.WritePosEx(15, 1000, SERVO_SPEED, SERVO_ACC);
+    // delay(6000);
+    // st.WritePosEx(15, 2047, SERVO_SPEED, SERVO_ACC);
+    // delay(6000);
+    // st.WritePosEx(14, 2900, SERVO_SPEED, SERVO_ACC);
+    // delay(6000);
+    // st.WritePosEx(14, 1100, SERVO_SPEED, SERVO_ACC);
+    // delay(9000);
+    // position[0] = 1250;
+    // position[1] = 4095 - position[0];
+    // st.SyncWritePosEx(ID, 2, position, speed, acc);
+    // delay(9000);
+    // position[0] = 2700;
+    // position[1] = 4095 - position[0];
+    // st.SyncWritePosEx(ID, 2, position, speed, acc);
+    // delay(9000);
+    // position[0] = 2047;
+    // position[1] = 4095 - position[0];
+    // st.SyncWritePosEx(ID, 2, position, speed, acc);
+    // delay(9000);
+    // st.WritePosEx(11, 0, SERVO_SPEED, SERVO_ACC);
+    // delay(9000);
+    // st.WritePosEx(11, 4095, SERVO_SPEED, SERVO_ACC);
+    // delay(9000);
+    // st.WritePosEx(11, 3000, SERVO_SPEED, SERVO_ACC);
+    // delay(6000);
 
     
 
