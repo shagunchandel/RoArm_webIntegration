@@ -3,6 +3,7 @@
 #include "arm_functn.h"
 #include "led_ctrl.h"
 #include "arm_wifi.h"
+#include "p_supply.h"
 
 // AsyncWebServer server(80);
 
@@ -46,13 +47,13 @@ void web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len) {
     st.WritePosEx(15, position5, SERVO_SPEED, SERVO_ACC);
   }
   else if (doc.containsKey("sholder")) {
-    position2 = doc["sholder"];
+    position[0] = doc["sholder"];
     // position3 = 2047 + (2047 - position2) + 1;
-    position3 = 4095 - position2;
-    byte ID[2] = {12, 13};
-    short position[2] = {position2, position3};
-    unsigned short speed[2] = {300, 300};  // Speed for both servos
-    byte acc[2] = {15, 15};
+    position[1] = 4095 - position[0];
+    // byte ID[2] = {12, 13};
+    // short position[2] = {position2, position3};
+    // unsigned short speed[2] = {300, 300};  // Speed for both servos
+    // byte acc[2] = {15, 15};
     st.SyncWritePosEx(ID, 2, position, speed, acc);
   }
   else if (doc.containsKey("elbow")) {
@@ -78,9 +79,10 @@ void web_movement(AsyncWebServerRequest *request, uint8_t *data, size_t len) {
 
 
 void setup() {
+  Wire.begin(S_SDA,S_SCL);
   Serial.begin(115200);
   Serial1.begin(1000000, SERIAL_8N1, S_RXD, S_TXD);
-
+  InitINA219();
 
   switchPinInit();
 
@@ -113,24 +115,65 @@ void setup() {
     }
   });
 
-//   server.on("/djs", HTTP_GET, [](AsyncWebServerRequest *request) {
-//     request->send(200, "text/html", html_djs);
-// });
+  server.on("/battery", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send_P(200, "text/html", htmlPage);
+      });
+      server.on("/temps", HTTP_GET, [](AsyncWebServerRequest *request){
+        String json = "{";
+        json += "\"temp1\":" + String(loadVoltage_V) + ",";
+        json += "\"temp2\":" + String(current_mA);
+        json += "}";
+        request->send(200, "application/json", json);
+        // Serial.println(json);
+    });
+
   server.begin();
 
   Serial.println(WiFi.localIP());
   ElegantOTA.begin(&server);
-  // lightCtrl(255);
+  lightCtrl(255);
 
 }
 
 void loop() {
-  if (WiFi.status() != WL_CONNECTED && millis() - previousOnlineCheck > 2000) {
+  if (WiFi.status() != WL_CONNECTED && millis() - previousOnlineCheck > 12000) {
         Serial.println("Wifi Check1");
         // onlineMode = false;
         connectToWiFi();
         previousOnlineCheck = millis();
     }
+    st.WritePosEx(15, 1000, SERVO_SPEED, SERVO_ACC);
+    delay(6000);
+    st.WritePosEx(15, 2047, SERVO_SPEED, SERVO_ACC);
+    delay(6000);
+    st.WritePosEx(14, 2900, SERVO_SPEED, SERVO_ACC);
+    delay(6000);
+    st.WritePosEx(14, 1100, SERVO_SPEED, SERVO_ACC);
+    delay(9000);
+    position[0] = 1250;
+    position[1] = 4095 - position[0];
+    st.SyncWritePosEx(ID, 2, position, speed, acc);
+    delay(9000);
+    position[0] = 2700;
+    position[1] = 4095 - position[0];
+    st.SyncWritePosEx(ID, 2, position, speed, acc);
+    delay(9000);
+    position[0] = 2047;
+    position[1] = 4095 - position[0];
+    st.SyncWritePosEx(ID, 2, position, speed, acc);
+    delay(9000);
+    st.WritePosEx(11, 0, SERVO_SPEED, SERVO_ACC);
+    delay(9000);
+    st.WritePosEx(11, 4095, SERVO_SPEED, SERVO_ACC);
+    delay(9000);
+    st.WritePosEx(11, 3000, SERVO_SPEED, SERVO_ACC);
+    delay(6000);
+
+    
+
+  
+    InaDataUpdate();
+    // allDataUpdate();
 
   // lightCtrl(255);
   ElegantOTA.loop();

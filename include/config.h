@@ -44,4 +44,9 @@ short position4 = initialPosition;
 short position5 = initialPosition;
 short position6 = initialPosition;
 
+byte ID[2] = {12, 13};
+short position[2] = {position2, position3};
+unsigned short speed[2] = {300, 300};  // Speed for both servos
+byte acc[2] = {15, 15};
+
 unsigned long previousOnlineCheck = 0;
